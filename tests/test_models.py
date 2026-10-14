@@ -104,3 +104,24 @@ def test_download_verifies_hash_and_leaves_no_partial_files(
     models.download(tmp_path, item, quiet=True)
     assert models.is_present(tmp_path, item, verify=True)
     assert [p.name for p in (tmp_path / "x").iterdir()] == ["model.bin"]
+
+
+def test_gpu_without_cuda_libraries_plans_for_the_cpu(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+    import types
+
+    from utterlane_live import gpu
+
+    fake = types.SimpleNamespace(get_cuda_device_count=lambda: 1)
+    monkeypatch.setitem(sys.modules, "ctranslate2", fake)
+    monkeypatch.setattr(gpu.sys, "platform", "linux")
+    monkeypatch.setattr(gpu, "enable_cuda_libraries", lambda: [])
+    monkeypatch.setattr(gpu, "_cuda_runtime_loadable", lambda: False)
+    hardware = gpu.detect_hardware()
+    assert not hardware.cuda and "without CUDA libraries" in hardware.describe()
+    choice = choose_stt(LiveConfig(), hardware)
+    assert choice.device == "cpu" and choice.compute_type == "int8"
+
+    monkeypatch.setattr(gpu, "_cuda_runtime_loadable", lambda: True)
+    monkeypatch.setattr(gpu, "_gpu_name", lambda: "Test GPU")
+    assert gpu.detect_hardware().cuda

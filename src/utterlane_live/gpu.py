@@ -84,19 +84,40 @@ class Hardware:
     cpu_count: int
     system: str
     machine: str
+    note: str = ""
 
     @property
     def apple_silicon(self) -> bool:
         return self.system == "Darwin" and self.machine in ("arm64", "aarch64")
 
     def describe(self) -> str:
-        gpu = f"CUDA GPU ({self.gpu_name})" if self.cuda else "no CUDA GPU"
+        gpu = f"CUDA GPU ({self.gpu_name})" if self.cuda else (self.note or "no CUDA GPU")
         return f"{self.system} {self.machine}, {self.cpu_count} CPU threads, {gpu}"
+
+
+def _cuda_runtime_loadable() -> bool:
+    """cuBLAS 12 and cuDNN 9, which CTranslate2 needs, can be loaded (pip wheels or system)."""
+
+    names = (
+        ("cublas64_12.dll", "cudnn64_9.dll")
+        if sys.platform == "win32"
+        else ("libcublas.so.12", "libcudnn.so.9")
+    )
+    for name in names:
+        try:
+            if sys.platform == "win32":
+                ctypes.WinDLL(name, winmode=0)  # standard search order, PATH included
+            else:
+                ctypes.CDLL(name)
+        except OSError:
+            return False
+    return True
 
 
 def detect_hardware() -> Hardware:
     cuda = False
     name: str | None = None
+    note = ""
     if sys.platform != "darwin":
         try:
             enable_cuda_libraries()
@@ -105,6 +126,10 @@ def detect_hardware() -> Hardware:
             cuda = ctranslate2.get_cuda_device_count() > 0
         except Exception:
             cuda = False
+        if cuda and not _cuda_runtime_loadable():
+            # A GPU and its driver, but a CPU-only install: plan for the CPU from the start.
+            cuda = False
+            note = "NVIDIA GPU without CUDA libraries (CPU install)"
         if cuda:
             name = _gpu_name()
     return Hardware(
@@ -113,6 +138,7 @@ def detect_hardware() -> Hardware:
         cpu_count=os.cpu_count() or 4,
         system=platform.system(),
         machine=platform.machine().lower(),
+        note=note,
     )
 
 
