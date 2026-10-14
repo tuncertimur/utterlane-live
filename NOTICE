@@ -1,0 +1,26 @@
+Utterlane Live
+Copyright 2026 Tuncer Timur
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It downloads and uses the following third-party models at runtime. They are not
+included in this repository; each keeps its own license:
+
+- Whisper large-v3-turbo (OpenAI, MIT), CTranslate2 conversion by
+  dropbox-dash/faster-whisper-large-v3-turbo (MIT)
+- Whisper small (OpenAI, MIT), CTranslate2 conversion by Systran/faster-whisper-small (MIT)
+- Silero VAD v6.2.1 (Silero Team, MIT)
+- NVIDIA NeMo TitaNet-L speaker embedding (CC-BY-4.0), ONNX export by the
+  sherpa-onnx project (k2-fsa)
+- WeSpeaker ResNet34-LM speaker embedding, trained on VoxCeleb (CC-BY-4.0), ONNX export
+  by the sherpa-onnx project (k2-fsa)
+- Pocket TTS Turkish by wite-tech (CC-BY-4.0), based on Kyutai Pocket TTS
+- Kyutai Pocket TTS (CC-BY-4.0); built-in voice embeddings from
+  kyutai/pocket-tts-without-voice-cloning. Voice sources (kyutai/tts-voices): alba (CC-BY-4.0,
+  the default English voice), VCTK voices such as anna, eve, george (CC-BY-4.0),
+  voice-donations and voice-zero voices (CC0). The "cosette" (Expresso) and "jean" (EARS)
+  voices are NON-COMMERCIAL only (CC-BY-NC-4.0).
+
+Key Python libraries: faster-whisper (MIT), CTranslate2 (MIT), sherpa-onnx
+(Apache-2.0), ONNX Runtime (MIT), PyTorch (BSD-3-Clause), pocket-tts (MIT),
+pocket-tts-turkish (Apache-2.0), FastAPI (MIT), MCP Python SDK (MIT).

@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- `lang` is set at runtime to the server's conversation language (en or tr). -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0b0d12" />
+    <meta name="description" content="Utterlane Live: a local, hands-free voice assistant that knows who is talking." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Utterlane Live</title>
+    <script>
+      // Apply the stored theme before first paint to avoid a flash.
+      (function () {
+        var t = null;
+        try {
+          t = localStorage.getItem("utterlane.live.theme");
+        } catch (e) {}
+        if (t !== "light" && t !== "dark") {
+          try {
+            t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          } catch (e) {
+            t = "dark";
+          }
+        }
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+# secrets and local config
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+
+# local environments and tools
+.venv/
+venv/
+.tools/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# web
+web/node_modules/
+web/dist/
+
+# never commit audio, voice prints or model weights
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.ogg
+*.opus
+*.npy
+*.npz
+*.onnx
+*.bin
+*.safetensors
+*.pt
+*.pth
+models/
+recordings/
+voice-profiles.bin
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.release-denylist
