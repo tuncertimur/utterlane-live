@@ -76,6 +76,8 @@ with an NVIDIA GPU (see [docs/MODELS.md](docs/MODELS.md)). Then open
 To give it a brain, copy `.env.example` to `.env` and choose one block — for example
 `OPENAI_API_KEY=…`, or `UTTERLANE_BRAIN=ollama` with `UTTERLANE_BRAIN_MODEL=qwen3:8b` for a
 free, fully local setup. Without a brain it still transcribes and labels speakers.
+Keys can also live in `config.env` in the data folder (`utterlane doctor` prints where), so
+they never sit in the app folder you might zip or share.
 
 ```bash
 utterlane --language en        # English (default: Turkish)
