@@ -88,5 +88,5 @@ strict = true
 files = ["src/utterlane_live"]
 
 [[tool.mypy.overrides]]
-module = ["pocket_tts", "pocket_tts.*", "pocket_tts_turkish", "pocket_tts_turkish.*"]
+module = ["pocket_tts", "pocket_tts.*", "pocket_tts_turkish", "pocket_tts_turkish.*", "nvidia", "nvidia.*"]
 ignore_missing_imports = true

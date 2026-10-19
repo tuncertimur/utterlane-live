@@ -19,6 +19,7 @@ import math
 import os
 import re
 import subprocess
+import sys
 import uuid
 import wave
 from collections.abc import AsyncIterator, Iterator
@@ -245,7 +246,9 @@ class WorkerTts:
         env["PATH"] = child_path()
         env.update({"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1", "HF_HUB_OFFLINE": "1"})
         env.update(self.spec.env or {})
-        flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
+        flags = 0
+        if sys.platform == "win32":
+            flags = subprocess.CREATE_NO_WINDOW
         self._proc = await asyncio.create_subprocess_exec(
             *self.spec.command,
             "--serve",

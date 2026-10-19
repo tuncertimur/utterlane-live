@@ -27,7 +27,7 @@ ADDED_PATHS: list[str] = []
 
 def _nvidia_roots() -> list[Path]:
     try:
-        import nvidia  # type: ignore[import-untyped]
+        import nvidia
     except ImportError:
         return []
     return [Path(p) for p in getattr(nvidia, "__path__", [])]
