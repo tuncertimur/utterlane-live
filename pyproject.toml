@@ -59,8 +59,10 @@ dev = [
 utterlane = "utterlane_live.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/tuncertimur/utterlane-live"
+Homepage = "https://tuncertimur.github.io/utterlane-live/"
+Repository = "https://github.com/tuncertimur/utterlane-live"
 Issues = "https://github.com/tuncertimur/utterlane-live/issues"
+Changelog = "https://github.com/tuncertimur/utterlane-live/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

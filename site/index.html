@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Utterlane Live — ears that know who's talking</title>
+<meta name="description" content="A free, open-source, local voice front-end that knows who is talking. Plug it into OpenAI, OpenClaw, Hermes Agent, Ollama or any MCP client.">
+<meta property="og:title" content="Utterlane Live">
+<meta property="og:description" content="Give your AI agent ears that know who's talking. Free, open source, runs on your computer.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tuncertimur.github.io/utterlane-live/">
+<meta property="og:image" content="https://tuncertimur.github.io/utterlane-live/media/poster-en.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0d18">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315182a'/%3E%3Cpath d='M8 11h12M8 16h16M8 21h9' stroke='%238c7cf6' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>
+  // Language before first paint: ?lang=tr|en, then the saved choice, then the browser's first language.
+  (function () {
+    var lang = new URLSearchParams(location.search).get("lang");
+    if (lang !== "tr" && lang !== "en") {
+      try { lang = localStorage.getItem("utterlane-lang"); } catch (e) { lang = null; }
+    }
+    if (lang !== "tr" && lang !== "en") {
+      var first = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+      lang = /^tr\b/i.test(first) ? "tr" : "en";
+    }
+    document.documentElement.lang = lang;
+  })();
+</script>
+<style>
+  :root {
+    --bg: #0b0d18;
+    --bg-2: #11142a;
+    --card: #151933;
+    --line: #262b4d;
+    --text: #e9ebf8;
+    --muted: #a2a7c7;
+    --violet: #8c7cf6;
+    --teal: #4fd1c5;
+    --pink: #ff6fae;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 70% -10%, #1d1840 0%, transparent 60%), var(--bg);
+    color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  html[lang="tr"] [data-lang="en"], html[lang="en"] [data-lang="tr"] { display: none !important; }
+  a { color: var(--teal); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 700; font-size: 18px; }
+  .brand b { background: linear-gradient(90deg, var(--violet), var(--teal)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-link { color: var(--muted); text-decoration: none; font-size: 15px; padding: 6px 8px; }
+  .nav-link:hover { color: var(--text); }
+  .switch { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--bg-2); }
+  .switch button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .switch button[aria-pressed="true"] { background: var(--violet); color: #0b0d18; }
+  header.hero { padding: 48px 0 28px; text-align: center; }
+  .hero h1 { font-size: clamp(32px, 5.6vw, 58px); line-height: 1.08; letter-spacing: -0.02em; margin: 0 auto 18px; max-width: 900px; }
+  .hero h1 .ears { color: var(--violet); }
+  .hero h1 .who { color: var(--teal); }
+  .hero p { color: var(--muted); font-size: clamp(17px, 2.2vw, 20px); max-width: 720px; margin: 0 auto 28px; }
+  .badges { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .badge { font: 600 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal); border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; background: var(--bg-2); }
+  .cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 650; padding: 12px 20px; border-radius: 12px; border: 1px solid var(--line); color: var(--text); background: var(--card); }
+  .btn.primary { background: linear-gradient(90deg, var(--violet), #6f86f7); color: #0b0d18; border: 0; }
+  .btn:hover { filter: brightness(1.08); }
+  .film { margin: 34px auto 10px; max-width: 960px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #000; box-shadow: 0 30px 80px rgba(80, 60, 200, 0.18); }
+  .film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; }
+  .film-note { text-align: center; color: var(--muted); font-size: 14px; margin: 10px 0 0; }
+  section { padding: 56px 0 8px; }
+  h2 { font-size: clamp(24px, 3.4vw, 34px); letter-spacing: -0.01em; margin: 0 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 26px; max-width: 760px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .tag { display: inline-block; font: 600 12px/1 ui-monospace, Menlo, Consolas, monospace; padding: 5px 8px; border-radius: 6px; margin-bottom: 10px; }
+  .t-blue { color: #8fb4ff; background: rgba(120, 160, 255, 0.12); }
+  .t-pink { color: var(--pink); background: rgba(255, 111, 174, 0.12); }
+  .t-amber { color: #f5c26b; background: rgba(245, 194, 107, 0.12); }
+  .t-teal { color: var(--teal); background: rgba(79, 209, 197, 0.12); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .stat .n { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; background: linear-gradient(90deg, var(--violet), var(--teal)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat .l { color: var(--muted); font-size: 14px; }
+  .fine { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .code { position: relative; background: #0a0c16; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 8px 0 16px; overflow-x: auto; }
+  .code pre { margin: 0; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d7dbf5; white-space: pre; }
+  .copy { position: absolute; top: 8px; right: 8px; border: 1px solid var(--line); background: var(--card); color: var(--muted); font: 600 12px/1 system-ui, sans-serif; padding: 6px 9px; border-radius: 8px; cursor: pointer; }
+  .copy:hover { color: var(--text); }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .cols h3 { margin: 6px 0 4px; font-size: 16px; }
+  ul.clean { margin: 0; padding-left: 20px; color: var(--muted); }
+  ul.clean li { margin: 6px 0; }
+  .warn { border-left: 3px solid var(--pink); padding: 10px 14px; background: rgba(255, 111, 174, 0.07); border-radius: 0 10px 10px 0; margin-top: 16px; }
+  footer { border-top: 1px solid var(--line); margin-top: 64px; padding: 26px 0 40px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 22px; justify-content: space-between; }
+  footer a { color: var(--muted); }
+  @media (max-width: 560px) {
+    .nav-link.hide-sm { display: none; }
+    header.hero { padding-top: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./" aria-label="Utterlane Live">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#15182a"/><path d="M8 11h12M8 16h16M8 21h9" stroke="#8c7cf6" stroke-width="3" stroke-linecap="round"/></svg>
+      <span>Utterlane <b>Live</b></span>
+    </a>
+    <div class="nav-right">
+      <a class="nav-link hide-sm" href="https://github.com/tuncertimur/utterlane-live/blob/main/docs/INTEGRATIONS.md"><span data-lang="en">Integrations</span><span data-lang="tr">Entegrasyonlar</span></a>
+      <a class="nav-link" href="https://github.com/tuncertimur/utterlane-live">GitHub</a>
+      <div class="switch" role="group" aria-label="Language / Dil">
+        <button type="button" data-set-lang="tr">TR</button>
+        <button type="button" data-set-lang="en">EN</button>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badges">
+      <span class="badge" data-lang="en">Free · Open source · Apache-2.0</span>
+      <span class="badge" data-lang="tr">Ücretsiz · Açık kaynak · Apache-2.0</span>
+      <span class="badge">Windows · macOS · Linux</span>
+    </div>
+    <h1 data-lang="en">Give your AI agent <span class="ears">ears</span> that know <span class="who">who's</span> talking.</h1>
+    <h1 data-lang="tr">Asistanına <span class="who">kimin</span> konuştuğunu bilen <span class="ears">kulaklar</span>.</h1>
+    <p data-lang="en">A local, hands-free voice front-end. It listens to the room, knows who said what, and answers out loud — with OpenAI, OpenClaw, Hermes Agent, a local model or anything OpenAI-compatible.</p>
+    <p data-lang="tr">Bilgisayarında çalışan, eller serbest bir sesli asistan ön yüzü. Odayı dinler, kimin ne dediğini bilir ve sesli cevap verir: OpenAI, OpenClaw, Hermes Agent, yerel bir model ya da OpenAI uyumlu her şeyle.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/tuncertimur/utterlane-live"><span data-lang="en">Get it on GitHub</span><span data-lang="tr">GitHub'dan indir</span></a>
+      <a class="btn" href="#install"><span data-lang="en">How to install</span><span data-lang="tr">Nasıl kurulur</span></a>
+    </div>
+
+    <div class="film" data-lang="en">
+      <video controls playsinline preload="metadata" poster="media/poster-en.jpg">
+        <source src="media/utterlane-live-en.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="film" data-lang="tr">
+      <video controls playsinline preload="metadata" poster="media/poster-tr.jpg">
+        <source src="media/utterlane-live-tr.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p class="film-note" data-lang="en">2-minute film · the conversations are real sessions with Tuncer and Zümra: in English, and in Turkish with English subtitles.</p>
+    <p class="film-note" data-lang="tr">1 dakika 48 saniyelik film · konuşma, Tuncer ve Zümra'yla yapılmış gerçek bir oturum.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2 data-lang="en">What it does</h2>
+    <h2 data-lang="tr">Ne yapar</h2>
+    <p class="lead" data-lang="en">Voice assistants assume one user. Real rooms have several. Utterlane Live keeps track of the people talking, so your agent knows who asked, who answered and when to stay quiet.</p>
+    <p class="lead" data-lang="tr">Sesli asistanlar tek kullanıcı varsayar; gerçek odalarda birden çok kişi konuşur. Utterlane Live konuşanları takip eder: ajanın kimin sorduğunu, kimin cevap verdiğini ve ne zaman susması gerektiğini bilir.</p>
+    <div class="grid">
+      <div class="card">
+        <span class="tag t-blue">Tuncer</span>
+        <h3 data-lang="en">Names from speech</h3><h3 data-lang="tr">Konuşmadan isim</h3>
+        <p data-lang="en">"I'm Tuncer" names a voice; it is recognized later even in random talk. "Ahmet, go ahead" labels the next new voice "Ahmet?".</p>
+        <p data-lang="tr">"Ben Tuncer" deyince o sesi isimlendirir, sonra rastgele konuşsa da tanır. "Ahmet sen konuş" denince sıradaki yeni sese "Ahmet?" der.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-amber" data-lang="en">Person 3</span><span class="tag t-amber" data-lang="tr">3. kişi</span>
+        <h3 data-lang="en">Strangers stay strangers</h3><h3 data-lang="tr">Tanımadığı sesler</h3>
+        <p data-lang="en">A voice that never introduces itself becomes "Person 3". When unsure, it says "Unclear" instead of guessing.</p>
+        <p data-lang="tr">Kendini tanıtmayan ses "3. kişi" olur. Emin değilse tahmin etmez, "Belirsiz" der.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-teal" data-lang="en">consent</span><span class="tag t-teal" data-lang="tr">onay</span>
+        <h3 data-lang="en">Remembers only after a "yes"</h3><h3 data-lang="tr">Yalnızca "evet" ile hatırlar</h3>
+        <p data-lang="en">It asks before saving a voice print. Saved prints are AES-256-GCM encrypted with a key in your OS keychain, and can be deleted any time.</p>
+        <p data-lang="tr">Ses izini kaydetmeden önce sorar. Kayıtlar, anahtarı işletim sisteminin anahtar deposunda duran AES-256-GCM şifrelemesiyle saklanır; istediğin an silinir.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-pink" data-lang="en">Lena, …</span><span class="tag t-pink" data-lang="tr">Lena, …</span>
+        <h3 data-lang="en">Knows when to stay quiet</h3><h3 data-lang="tr">Ne zaman susacağını bilir</h3>
+        <p data-lang="en">Alone with you it answers everything. In a group it speaks only when called by name, and never cuts in when you hand the floor to someone else.</p>
+        <p data-lang="tr">Tek kişiyle her şeye cevap verir. Grupta yalnızca adı söylenince konuşur; sözü başkasına verdiğinde araya girmez.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-blue">brain</span>
+        <h3 data-lang="en">Bring your own brain</h3><h3 data-lang="tr">Beyni sen seç</h3>
+        <p data-lang="en">OpenAI, OpenClaw, Hermes Agent, Ollama, LM Studio, any OpenAI-compatible server or your own webhook — or none at all.</p>
+        <p data-lang="tr">OpenAI, OpenClaw, Hermes Agent, Ollama, LM Studio, OpenAI uyumlu her sunucu ya da kendi webhook'un. İstersen hiçbiri.</p>
+      </div>
+      <div class="card">
+        <span class="tag t-teal">MCP</span>
+        <h3 data-lang="en">The room as a tool</h3><h3 data-lang="tr">Oda bir araç olur</h3>
+        <p data-lang="en">A built-in MCP server lets OpenClaw, Hermes, Claude or Cursor read the room (<code>recent_turns</code>, <code>list_speakers</code>) and speak (<code>speak</code>).</p>
+        <p data-lang="tr">Yerleşik MCP sunucusuyla OpenClaw, Hermes, Claude ya da Cursor odayı okur (<code>recent_turns</code>, <code>list_speakers</code>) ve konuşur (<code>speak</code>).</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-lang="en">Measured, not promised</h2>
+    <h2 data-lang="tr">Söz değil, ölçüm</h2>
+    <div class="stats">
+      <div class="stat"><div class="n">13/13</div><div class="l" data-lang="en">speaker labels right on real voices</div><div class="l" data-lang="tr">gerçek seslerle doğru konuşmacı etiketi</div></div>
+      <div class="stat"><div class="n" data-lang="en">93.6%</div><div class="n" data-lang="tr">%93,6</div><div class="l" data-lang="en">right across 30 randomized multi-person sessions</div><div class="l" data-lang="tr">30 rastgele çok kişilik oturumda doğru</div></div>
+      <div class="stat"><div class="n" data-lang="en">0.11</div><div class="n" data-lang="tr">0,11</div><div class="l" data-lang="en">Turkish word error rate (Whisper large-v3-turbo)</div><div class="l" data-lang="tr">Türkçe kelime hata oranı (Whisper large-v3-turbo)</div></div>
+      <div class="stat"><div class="n" data-lang="en">2.0–2.6 s</div><div class="n" data-lang="tr">2,0–2,6 sn</div><div class="l" data-lang="en">from end of speech to the first spoken reply (GPU)</div><div class="l" data-lang="tr">söz bitince ilk sesli cevaba kadar (GPU)</div></div>
+    </div>
+    <p class="fine" data-lang="en">Measured on consented recordings of two people plus public FLEURS voices (RTX 3080). Your room and microphone will differ.</p>
+    <p class="fine" data-lang="tr">İki kişinin onaylı kayıtları ve açık FLEURS sesleriyle ölçüldü (RTX 3080). Senin odan ve mikrofonun farklı sonuç verebilir.</p>
+  </section>
+
+  <section id="install">
+    <h2 data-lang="en">Install</h2>
+    <h2 data-lang="tr">Kurulum</h2>
+    <p class="lead" data-lang="en">One folder, nothing system-wide. The first run installs a private Python, picks the CUDA or CPU build and downloads the models it needs (hash-verified; about 1 GB without a GPU, 2 GB with one). Then open <code>http://127.0.0.1:8765</code> and talk.</p>
+    <p class="lead" data-lang="tr">Tek klasör, sisteme hiçbir şey kurulmaz. İlk açılış kendi Python'unu kurar, CUDA ya da CPU sürümünü seçer ve gereken modelleri indirir (hash ile doğrulanır; GPU'suz yaklaşık 1 GB, GPU ile 2 GB). Sonra <code>http://127.0.0.1:8765</code> adresini açıp konuş.</p>
+    <div class="cols">
+      <div>
+        <h3>Windows 10/11</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>git clone https://github.com/tuncertimur/utterlane-live
+cd utterlane-live
+.\Utterlane.cmd</pre></div>
+      </div>
+      <div>
+        <h3 data-lang="en">macOS (Apple Silicon) · Linux</h3><h3 data-lang="tr">macOS (Apple Silicon) · Linux</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>git clone https://github.com/tuncertimur/utterlane-live
+cd utterlane-live
+./utterlane.sh</pre></div>
+      </div>
+    </div>
+    <p class="lead" data-lang="en">To give it a brain, put <code>OPENAI_API_KEY=…</code> in a <code>.env</code> file — or <code>UTTERLANE_BRAIN=ollama</code> for a free, fully local setup. English: <code>utterlane --language en</code>.</p>
+    <p class="lead" data-lang="tr">Beyin vermek için <code>.env</code> dosyasına <code>OPENAI_API_KEY=…</code> yaz; tamamen ücretsiz ve yerel kurulum için <code>UTTERLANE_BRAIN=ollama</code>. İngilizce için: <code>utterlane --language en</code>.</p>
+  </section>
+
+  <section>
+    <h2 data-lang="en">Connect your agent</h2>
+    <h2 data-lang="tr">Ajanına bağla</h2>
+    <div class="cols">
+      <div>
+        <h3>OpenClaw</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>openclaw mcp add utterlane --url http://127.0.0.1:8765/mcp --transport streamable-http</pre></div>
+        <h3>Claude Code</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>claude mcp add --transport http utterlane http://127.0.0.1:8765/mcp</pre></div>
+      </div>
+      <div>
+        <h3 data-lang="en">Hermes Agent (~/.hermes/config.yaml)</h3><h3 data-lang="tr">Hermes Agent (~/.hermes/config.yaml)</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>mcp_servers:
+  utterlane:
+    url: "http://127.0.0.1:8765/mcp"</pre></div>
+        <h3 data-lang="en">Agent Skill</h3><h3 data-lang="tr">Ajan becerisi (skill)</h3>
+        <div class="code"><button class="copy" type="button">Copy</button><pre>npx skills add tuncertimur/utterlane-live -g -a openclaw hermes-agent claude-code codex</pre></div>
+      </div>
+    </div>
+    <p class="lead"><a href="https://github.com/tuncertimur/utterlane-live/blob/main/docs/INTEGRATIONS.md"><span data-lang="en">All integrations: OpenClaw, Hermes, Ollama, LM Studio, webhooks, REST →</span><span data-lang="tr">Tüm entegrasyonlar: OpenClaw, Hermes, Ollama, LM Studio, webhook, REST →</span></a></p>
+  </section>
+
+  <section>
+    <h2 data-lang="en">Privacy</h2>
+    <h2 data-lang="tr">Gizlilik</h2>
+    <ul class="clean" data-lang="en">
+      <li>Audio, transcripts and voice prints stay on your computer. A brain receives only conversation text with speaker labels.</li>
+      <li>The server listens on 127.0.0.1 only and rejects requests from other websites.</li>
+      <li>Voice prints are stored only after a spoken yes, encrypted, and can be deleted any time.</li>
+    </ul>
+    <ul class="clean" data-lang="tr">
+      <li>Ses, yazıya dökülen metin ve ses izleri bilgisayarında kalır. Beyne yalnızca konuşmacı etiketli metin gider.</li>
+      <li>Sunucu yalnızca 127.0.0.1'de dinler; başka web sitelerinden gelen istekleri reddeder.</li>
+      <li>Ses izleri yalnızca sesli bir "evet"ten sonra, şifreli saklanır ve istediğin an silinir.</li>
+    </ul>
+    <p class="warn" data-lang="en"><strong>A voice match is a label, not authentication.</strong> Recordings or cloned voices can fool it; don't let it unlock anything sensitive.</p>
+    <p class="warn" data-lang="tr"><strong>Ses eşleşmesi bir etikettir, kimlik doğrulama değildir.</strong> Kayıtlar ya da klonlanmış sesler onu kandırabilir; hassas hiçbir şeyin kilidini ona bağlama.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Utterlane Live · Apache-2.0 · © 2026 Tuncer Timur</span>
+    <span>
+      <a href="https://github.com/tuncertimur/utterlane-live">GitHub</a> ·
+      <a href="https://github.com/tuncertimur/utterlane-live/blob/main/SECURITY.md"><span data-lang="en">Security</span><span data-lang="tr">Güvenlik</span></a> ·
+      <a href="https://github.com/tuncertimur/utterlane-live/blob/main/docs/MODELS.md"><span data-lang="en">Models &amp; licenses</span><span data-lang="tr">Modeller ve lisanslar</span></a>
+    </span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var titles = {
+      en: "Utterlane Live — ears that know who's talking",
+      tr: "Utterlane Live — kimin konuştuğunu bilen kulaklar"
+    };
+    var copyLabel = { en: ["Copy", "Copied"], tr: ["Kopyala", "Kopyalandı"] };
+
+    function apply(lang) {
+      document.documentElement.lang = lang;
+      document.title = titles[lang];
+      document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.getAttribute("data-set-lang") === lang));
+      });
+      document.querySelectorAll(".copy").forEach(function (b) { b.textContent = copyLabel[lang][0]; });
+      document.querySelectorAll('[data-lang] video').forEach(function (v) {
+        if (v.closest("[data-lang]").getAttribute("data-lang") !== lang && !v.paused) v.pause();
+      });
+    }
+
+    document.querySelectorAll("[data-set-lang]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var lang = b.getAttribute("data-set-lang");
+        try { localStorage.setItem("utterlane-lang", lang); } catch (e) {}
+        apply(lang);
+      });
+    });
+
+    document.querySelectorAll(".copy").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var text = b.parentElement.querySelector("pre").textContent;
+        var lang = document.documentElement.lang;
+        var done = function () {
+          b.textContent = copyLabel[lang][1];
+          setTimeout(function () { b.textContent = copyLabel[lang][0]; }, 1500);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () {});
+        }
+      });
+    });
+
+    apply(document.documentElement.lang === "tr" ? "tr" : "en");
+  })();
+</script>
+</body>
+</html>

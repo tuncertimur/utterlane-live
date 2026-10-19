@@ -1,4 +1,6 @@
 <!-- mcp-name: io.github.tuncertimur/utterlane-live -->
+<p align="center"><b>English</b> · <a href="README.tr.md">Türkçe</a></p>
+
 <h1 align="center">Utterlane Live</h1>
 
 <p align="center"><b>Give your AI agent ears that know who's talking.</b></p>
@@ -10,14 +12,29 @@ OpenAI-compatible. Speech recognition, speaker identification and the voice all 
 </p>
 
 <p align="center">
+  <a href="https://github.com/tuncertimur/utterlane-live/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/tuncertimur/utterlane-live/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache--2.0-blue"></a>
+  <img alt="Windows · macOS · Linux" src="https://img.shields.io/badge/runs%20on-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-555">
+  <img alt="Turkish · English" src="https://img.shields.io/badge/languages-Turkish%20%C2%B7%20English-8c7cf6">
+</p>
+
+<p align="center">
+  <a href="https://tuncertimur.github.io/utterlane-live/?lang=en">
+    <img src="site/media/poster-en.jpg" alt="Utterlane Live — watch the 2-minute demo" width="760">
+  </a>
+  <br>
+  <a href="https://tuncertimur.github.io/utterlane-live/?lang=en"><b>▶ Watch the 2-minute demo</b></a>
+  · real sessions with two people and one microphone ·
+  <a href="site/media/utterlane-live-en.mp4">MP4</a>
+</p>
+
+<p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="docs/INTEGRATIONS.md">Connect your agent</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#privacy-and-safety">Privacy</a> ·
-  <a href="#türkçe">Türkçe</a>
+  <a href="https://tuncertimur.github.io/utterlane-live/">Website</a>
 </p>
-
-<!-- DEMO-VIDEO -->
 
 ---
 
@@ -34,8 +51,8 @@ they don't — so your agent knows who asked, who answered, and when to stay qui
   corrects it, retroactively. Voices that never introduce themselves become *Person 3*,
   *Person 4*…
 - **Consent-first voice memory** — it asks *"Would you like me to recognize your voice next
-  time?"*; only a spoken *yes* stores the voice print, AES-GCM encrypted with a key kept in
-  your OS keychain. Delete any time.
+  time?"*; only a clear spoken *yes* right after the question stores the voice print,
+  AES-256-GCM encrypted with a key kept in your OS keychain. Delete any time.
 - **Group etiquette** — alone, it answers everything; in a group it only speaks when
   addressed ("Lena, …"), and never cuts in when you hand the floor to someone else.
 - **Bring your own brain** — OpenAI, OpenClaw, Hermes Agent, Ollama, LM Studio, any
@@ -76,13 +93,15 @@ with an NVIDIA GPU (see [docs/MODELS.md](docs/MODELS.md)). Then open
 To give it a brain, copy `.env.example` to `.env` and choose one block — for example
 `OPENAI_API_KEY=…`, or `UTTERLANE_BRAIN=ollama` with `UTTERLANE_BRAIN_MODEL=qwen3:8b` for a
 free, fully local setup. Without a brain it still transcribes and labels speakers.
-Keys can also live in `config.env` in the data folder (`utterlane doctor` prints where), so
-they never sit in the app folder you might zip or share.
+`.env` is git-ignored; keys can also live in `config.env` in the data folder (the `doctor`
+command prints where), so they never sit in a folder you might zip or share.
+
+Options go after the launcher (`.\Utterlane.cmd …` on Windows, `./utterlane.sh …` elsewhere):
 
 ```bash
-utterlane --language en        # English (default: Turkish)
-utterlane --voice george       # pick a voice
-utterlane doctor               # check the installation
+./utterlane.sh --language en      # English (default: Turkish)
+./utterlane.sh --voice george     # pick a voice (docs/MODELS.md)
+./utterlane.sh doctor             # check the installation
 ```
 
 ## Connect your agent
@@ -142,11 +161,11 @@ The model is chosen automatically: `large-v3-turbo` with an NVIDIA GPU or a CPU 
   conversation text with speaker labels.
 - Voice prints are stored only after a spoken *yes*, encrypted (AES-256-GCM, key in Windows
   Credential Manager / macOS Keychain / Secret Service), and can be deleted in the UI or with
-  `utterlane profiles delete-all`.
+  `./utterlane.sh profiles delete-all` (`.\Utterlane.cmd profiles delete-all` on Windows).
 - **A voice match is a label, not authentication.** Recordings or cloned voices can fool it.
   Don't let it unlock anything sensitive; keep tool-using agents on a restricted profile.
 - The server listens on `127.0.0.1` only. Requests from other websites are rejected; set
-  `UTTERLANE_API_TOKEN` before exposing it on a network.
+  `UTTERLANE_API_TOKEN` before exposing it on a network. Details: [SECURITY.md](SECURITY.md).
 
 ## Configuration
 
@@ -168,19 +187,15 @@ Everything is optional; see [`.env.example`](.env.example). Common settings:
 - Two people talking at the same time can't be separated with one microphone; such turns
   may be marked unclear.
 - Unknown voices that sound alike can be merged into one "Person N".
-- Thresholds were calibrated on studio-like recordings; a noisy room may need tuning
-  (`config.SpeakerThresholds`).
+- Thresholds were calibrated on clean, consented recordings plus public FLEURS voices; a
+  noisy room may need tuning (`config.SpeakerThresholds`).
 - Turkish and English today. Pocket TTS also speaks German, French, Spanish, Italian,
   Portuguese and Dutch, but naming phrases are only implemented for Turkish and English.
 
-## Türkçe
+## Contributing
 
-**Utterlane Live**, odadaki konuşmayı yerelde dinleyen, **kimin** konuştuğunu bilen ve sesli
-cevap veren bir asistan ön yüzüdür. "Ben Tuncer" dediğinizde sizi tanır, "Ahmet sen konuş"
-denince sonraki yeni sesi "Ahmet?" olarak etiketler, kendini tanıtmayan sese "3. kişi" der.
-Sesinizi yalnızca sesli onayınızla, şifreli olarak bu bilgisayarda saklar. OpenAI, OpenClaw,
-Hermes Agent, Ollama gibi bir "beyne" bağlanabilir ya da MCP ile ajanlara araç olarak açılır.
-Kurulum: Windows'ta `Utterlane.cmd`, macOS/Linux'ta `./utterlane.sh`. Varsayılan dil Türkçedir.
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Please report
+security problems privately ([SECURITY.md](SECURITY.md)).
 
 ## License
 
