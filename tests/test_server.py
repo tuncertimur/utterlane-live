@@ -210,3 +210,43 @@ def test_api_token_required_when_configured(
         assert login.status_code == 303 and "utterlane_token" in login.headers["set-cookie"]
         assert "httponly" in login.headers["set-cookie"].lower()
         assert client.get("/api/turns").status_code == 200  # cookie now held by the client
+
+
+def test_voice_model_is_downloaded_once_when_not_cached(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import asyncio
+
+    from utterlane_live import server as srv
+
+    started: list[str | None] = []
+
+    class FakeWorker:
+        error = (
+            "tts_worker_load_failed:LocalEntryNotFoundError: Cannot find an appropriate cached "
+            "snapshot folder for the specified revision on the local disk and outgoing traffic "
+            "has been disabled."
+        )
+
+        def __init__(self, spec: Any, cache_dir: Path) -> None:
+            self.spec = spec
+
+        async def start(self) -> None:
+            started.append(self.spec.env.get("HF_HUB_OFFLINE"))
+            if self.spec.env.get("HF_HUB_OFFLINE") != "0":
+                raise RuntimeError(self.error)
+
+        async def close(self) -> None:
+            return None
+
+    monkeypatch.setattr(srv, "WorkerTts", FakeWorker)
+    cfg = LiveConfig()
+    cfg.data_dir = tmp_path
+    tts, status = asyncio.run(srv.start_voice(cfg))
+    assert isinstance(tts, FakeWorker) and status["status"] == "ready"
+    assert started == [None, "0"]  # offline first, then one download
+
+    started.clear()
+    FakeWorker.error = "tts_worker_load_failed:RuntimeError: CUDA error"
+    _, status = asyncio.run(srv.start_voice(cfg))
+    assert status["status"] == "error" and started == [None]  # other errors: no download

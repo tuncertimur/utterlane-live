@@ -85,27 +85,40 @@ async def build_engines(cfg: LiveConfig, ledger: SpendLedger, hardware: Hardware
     await brain.warmup()
     status["llm"] = _status(description, "ready" if brain.mode != "off" else "off")
 
-    tts: TtsEngine
-    spec = worker_spec(cfg)
-    if spec is None:
-        tts = MockTts()
-        status["tts"] = _status("none", "off")
-    else:
-        worker = WorkerTts(spec, cfg.data_dir / "tts-cache")
-        try:
-            await worker.start()
-            tts = worker
-            note = ATTRIBUTION.get(cfg.language, "")
-            if spec.voice in NON_COMMERCIAL_VOICES:
-                note += f" Note: the '{spec.voice}' voice is licensed for non-commercial use only."
-            status["tts"] = _status(f"{spec.engine_id}:{spec.voice}", "ready", note)
-        except Exception as exc:
-            await worker.close()
-            tts = MockTts()
-            status["tts"] = _status(spec.engine_id, "error", f"{type(exc).__name__}: {exc}"[:200])
+    tts, status["tts"] = await start_voice(cfg)
     return Engines(
         vad_factory=vad_factory, stt=stt, embedder=embedder, llm=brain, tts=tts, status=status
     )
+
+
+# Hugging Face's offline-mode error when a model was never downloaded into the cache.
+_VOICE_NOT_CACHED = ("LocalEntryNotFoundError", "outgoing traffic has been disabled")
+
+
+async def start_voice(cfg: LiveConfig) -> tuple[TtsEngine, dict[str, str]]:
+    """Start the TTS worker offline; if its voice model is not cached yet, download it once."""
+
+    spec = worker_spec(cfg)
+    if spec is None:
+        return MockTts(), _status("none", "off")
+    for online in (False, True):
+        current = worker_spec(cfg, online=True) if online else spec
+        assert current is not None
+        if online:
+            print("Downloading the voice model (one time, about 0.4 GB) …", flush=True)
+        worker = WorkerTts(current, cfg.data_dir / "tts-cache")
+        try:
+            await worker.start()
+        except Exception as exc:
+            await worker.close()
+            if not online and any(mark in str(exc) for mark in _VOICE_NOT_CACHED):
+                continue  # e.g. setup was skipped or interrupted
+            return MockTts(), _status(spec.engine_id, "error", f"{type(exc).__name__}: {exc}"[:200])
+        note = ATTRIBUTION.get(cfg.language, "")
+        if spec.voice in NON_COMMERCIAL_VOICES:
+            note += f" Note: the '{spec.voice}' voice is licensed for non-commercial use only."
+        return worker, _status(f"{spec.engine_id}:{spec.voice}", "ready", note)
+    raise AssertionError("unreachable")
 
 
 def _origin_allowed(origin: str | None) -> bool:
