@@ -18,14 +18,12 @@ bilgisayarında çalışır.
   <img alt="Türkçe · İngilizce" src="https://img.shields.io/badge/diller-T%C3%BCrk%C3%A7e%20%C2%B7%20%C4%B0ngilizce-8c7cf6">
 </p>
 
+https://github.com/user-attachments/assets/18b00ef2-3b49-475d-bc4f-f764c7a55221
+
 <p align="center">
-  <a href="https://tuncertimur.github.io/utterlane-live/?lang=tr">
-    <img src="site/media/poster-tr.jpg" alt="Utterlane Live — 2 dakikalık tanıtım filmini izle" width="760">
-  </a>
-  <br>
-  <a href="https://tuncertimur.github.io/utterlane-live/?lang=tr"><b>▶ Tanıtım filmini izle (1 dk 48 sn)</b></a>
-  · iki kişi, tek mikrofon, gerçek oturum ·
-  <a href="site/media/utterlane-live-tr.mp4">MP4</a>
+  İki kişi, tek mikrofon, gerçek oturum ·
+  <a href="https://tuncertimur.github.io/utterlane-live/?lang=tr">Web sitesi</a> ·
+  <a href="https://github.com/tuncertimur/utterlane-live/releases/tag/v0.1.0">1 dakikalık sürüm</a>
 </p>
 
 <p align="center">

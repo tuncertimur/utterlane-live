@@ -18,14 +18,12 @@ OpenAI-compatible. Speech recognition, speaker identification and the voice all 
   <img alt="Turkish · English" src="https://img.shields.io/badge/languages-Turkish%20%C2%B7%20English-8c7cf6">
 </p>
 
+https://github.com/user-attachments/assets/479a4c5e-43c9-4d59-802d-701c07f39b6d
+
 <p align="center">
-  <a href="https://tuncertimur.github.io/utterlane-live/?lang=en">
-    <img src="site/media/poster-en.jpg" alt="Utterlane Live — watch the 2-minute demo" width="760">
-  </a>
-  <br>
-  <a href="https://tuncertimur.github.io/utterlane-live/?lang=en"><b>▶ Watch the 2-minute demo</b></a>
-  · real sessions with two people and one microphone ·
-  <a href="site/media/utterlane-live-en.mp4">MP4</a>
+  Real sessions with two people and one microphone ·
+  <a href="https://tuncertimur.github.io/utterlane-live/?lang=en">Website</a> ·
+  <a href="https://github.com/tuncertimur/utterlane-live/releases/tag/v0.1.0">1-minute version</a>
 </p>
 
 <p align="center">
