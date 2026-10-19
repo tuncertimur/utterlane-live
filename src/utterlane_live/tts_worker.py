@@ -52,6 +52,19 @@ POCKET_LANGUAGES = {
 DEFAULT_VOICES = {"tr": "female_1", "en": "alba"}
 
 
+def pick_voice(language: str, wanted: str | None, available: list[str]) -> tuple[str, str]:
+    """The voice to use and a note when the wanted one does not exist for this language."""
+
+    default = DEFAULT_VOICES.get(language, available[0])
+    if default not in available:
+        default = available[0]
+    if not wanted or wanted == "default":
+        return default, ""
+    if wanted in available:
+        return wanted, ""
+    return default, f"voice {wanted!r} is not available in {language!r}; using {default!r}"
+
+
 def resolve_device(choice: str) -> str:
     import torch
 
@@ -89,18 +102,11 @@ class PocketEngine:
             self._states: dict[str, Any] = {}
         else:
             raise ValueError(f"unsupported language {language!r}")
-        default = DEFAULT_VOICES.get(language, self.voices[0])
-        self.default_voice = voice if voice and voice != "default" else default
-        if self.default_voice not in self.voices:
-            raise ValueError(
-                f"unknown voice {self.default_voice!r}; available: {', '.join(self.voices)}"
-            )
+        self.default_voice, self.note = pick_voice(language, voice, self.voices)
 
     def _voice(self, voice: str | None) -> str:
         chosen = voice if voice and voice != "default" else self.default_voice
-        if chosen not in self.voices:
-            raise ValueError(f"unknown voice {chosen!r}")
-        return chosen
+        return chosen if chosen in self.voices else self.default_voice
 
     def stream(self, text: str, voice: str | None) -> Iterator[np.ndarray]:
         name = self._voice(voice)
@@ -212,6 +218,7 @@ def main(argv: list[str] | None = None) -> int:
         "sample_rate": engine.sample_rate,
         "voices": engine.voices,
         "voice": engine.default_voice,
+        "note": engine.note,
         "load_ms": round((time.perf_counter() - started) * 1000, 1),
     }
 

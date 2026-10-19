@@ -9,6 +9,7 @@ from utterlane_live.config import LiveConfig
 from utterlane_live.tts import WorkerSpec
 
 DEFAULT_VOICES = {"tr": "female_1", "en": "alba"}
+TURKISH_VOICES = frozenset({"female_1", "female_2", "female_3", "male_1", "male_2", "male_3"})
 WARMUP_TEXT = {"tr": "Merhaba.", "en": "Hello."}
 
 # kyutai/tts-voices sources with non-commercial licenses (CC-BY-NC-4.0).
@@ -36,6 +37,9 @@ def worker_spec(cfg: LiveConfig, *, online: bool = False) -> WorkerSpec | None:
         if cfg.tts_voice not in ("", "default")
         else DEFAULT_VOICES.get(cfg.language, "default")
     )
+    if voice != "default" and (voice in TURKISH_VOICES) != (cfg.language == "tr"):
+        # e.g. UTTERLANE_TTS_VOICE=female_1 (Turkish model) with --language en
+        voice = DEFAULT_VOICES.get(cfg.language, "default")
     env = {"HF_HOME": str(hf_home(cfg))}
     if online:
         env["HF_HUB_OFFLINE"] = "0"

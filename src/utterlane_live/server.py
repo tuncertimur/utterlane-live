@@ -114,10 +114,14 @@ async def start_voice(cfg: LiveConfig) -> tuple[TtsEngine, dict[str, str]]:
             if not online and any(mark in str(exc) for mark in _VOICE_NOT_CACHED):
                 continue  # e.g. setup was skipped or interrupted
             return MockTts(), _status(spec.engine_id, "error", f"{type(exc).__name__}: {exc}"[:200])
+        ready = getattr(worker, "ready_info", None) or {}
+        voice = str(ready.get("voice") or spec.voice)
         note = ATTRIBUTION.get(cfg.language, "")
-        if spec.voice in NON_COMMERCIAL_VOICES:
-            note += f" Note: the '{spec.voice}' voice is licensed for non-commercial use only."
-        return worker, _status(f"{spec.engine_id}:{spec.voice}", "ready", note)
+        if ready.get("note"):
+            note += f" Note: {ready['note']}."
+        if voice in NON_COMMERCIAL_VOICES:
+            note += f" Note: the '{voice}' voice is licensed for non-commercial use only."
+        return worker, _status(f"{spec.engine_id}:{voice}", "ready", note)
     raise AssertionError("unreachable")
 
 

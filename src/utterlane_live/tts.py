@@ -24,7 +24,7 @@ import wave
 from collections.abc import AsyncIterator, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import IO, Protocol
+from typing import IO, Any, Protocol
 
 import numpy as np
 
@@ -222,6 +222,7 @@ class WorkerTts:
         self.engine_id = spec.engine_id
         self.sample_rate = 24_000
         self.out_dir = out_dir
+        self.ready_info: dict[str, Any] = {}
         self._proc: asyncio.subprocess.Process | None = None
         self._lock = asyncio.Lock()
 
@@ -281,6 +282,9 @@ class WorkerTts:
                 continue  # stray library output on stdout
             if reply.get("event") == "load_failed":
                 raise RuntimeError(f"tts_worker_load_failed:{reply.get('error')}")
+            if reply.get("event") == "ready":
+                self.ready_info = reply  # the voice actually in use, and any note about it
+                continue
             if reply.get("id") != request_id:
                 continue
             if "error" in reply:

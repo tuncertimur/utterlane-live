@@ -125,3 +125,25 @@ def test_gpu_without_cuda_libraries_plans_for_the_cpu(monkeypatch: pytest.Monkey
     monkeypatch.setattr(gpu, "_cuda_runtime_loadable", lambda: True)
     monkeypatch.setattr(gpu, "_gpu_name", lambda: "Test GPU")
     assert gpu.detect_hardware().cuda
+
+
+def test_voice_follows_the_language() -> None:
+    from utterlane_live.tts_worker import pick_voice
+    from utterlane_live.voices import worker_spec
+
+    english = ["alba", "george", "jean"]
+    assert pick_voice("en", None, english) == ("alba", "")
+    assert pick_voice("en", "george", english) == ("george", "")
+    voice, note = pick_voice("en", "female_1", english)
+    assert voice == "alba" and "female_1" in note
+
+    cfg = LiveConfig()
+    cfg.language, cfg.tts_voice = "en", "female_1"  # a Turkish voice left in .env
+    spec = worker_spec(cfg)
+    assert spec is not None and spec.voice == "alba"
+    cfg.language, cfg.tts_voice = "tr", "george"
+    spec = worker_spec(cfg)
+    assert spec is not None and spec.voice == "female_1"
+    cfg.language, cfg.tts_voice = "tr", "male_2"
+    spec = worker_spec(cfg)
+    assert spec is not None and spec.voice == "male_2"
